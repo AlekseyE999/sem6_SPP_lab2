@@ -5,6 +5,9 @@ async function responseRoutine(response) {
         reset();
         drawRoot();
         drawTasks(data.tasks);
+    } else if (response.status === 401) {
+        reset();
+        drawsignInRoot();
     }
 }
 
@@ -50,6 +53,24 @@ async function completeTask(task) {
     await responseRoutine(response);
 }
 
+async function sendUser(user) {
+    const response = await fetch('/signIn', {
+        method: "POST",
+        headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify(user)
+    });
+    await responseRoutine(response);
+}
+
+async function addUser(user) {
+    const response = await fetch('/signUp', {
+        method: "POST",
+        headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify(user)
+    });
+    await responseRoutine(response);
+}
+
 function reset() {
     document.getElementById("root").innerHTML = "";
 }
@@ -81,6 +102,48 @@ function drawRoot() {
         };
         createTask(obj, form.elements["task-files"]).then();
     });
+}
+
+function onSignIn(e) {
+    e.preventDefault();
+    const form = document.forms["signIn"];
+    let user = {
+        login: form.elements["login"].value,
+        password: form.elements["password"].value
+    };
+    console.log(user);
+    sendUser(user).then();
+}
+
+function onSignUp(e) {
+    e.preventDefault();
+    const form = document.forms["signUp"];
+    let user = {
+        login: form.elements["login"].value,
+        password: form.elements["password"].value
+    };
+    console.log(user);
+    addUser(user).then();
+}
+
+function drawsignInRoot() {
+    reset()
+    document.getElementById("root").insertAdjacentHTML('beforeend', getsignInRoot())
+    document.getElementById("sup").addEventListener("click", e => {
+        e.preventDefault()
+        drawsignUpRoot()
+    })
+    document.forms["signIn"].addEventListener("submit", e => onSignIn(e));
+}
+
+function drawsignUpRoot() {
+    reset()
+    document.getElementById("root").insertAdjacentHTML('beforeend', getsignUpRoot())
+    document.getElementById("sin").addEventListener("click", e => {
+        e.preventDefault()
+        drawsignInRoot()
+    })
+    document.forms["signUp"].addEventListener("submit", e => onSignUp(e));
 }
 
 drawRoot()

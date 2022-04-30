@@ -1,3 +1,67 @@
+function getsignInRoot() {
+    return `<form name="signIn" style="height:100%;">
+                <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
+                    <div class="text-center">
+                        <h2>Sign in</h2>
+                    </div>
+                    <label class="mdc-text-field mdc-text-field--filled" style="margin-top:50px;>
+                        <span class="mdc-text-field__ripple"></span>
+                        <span class="mdc-floating-label" id="my-label-id" style="bottom:-20px;">Login</span>
+                        <input class="mdc-text-field__input" type="text" aria-labelledby="my-label-id" id="paperInputs1" name="login">
+                    </label>
+                    <label class="mdc-text-field mdc-text-field--filled" style="margin-top:20px;>
+                        <span class="mdc-text-field__ripple"></span>
+                        <span class="mdc-floating-label" id="my-label-id" style="bottom:-20px;">Password</span>
+                        <input class="mdc-text-field__input" type="password" aria-labelledby="my-label-id" id="paperInputs2" name="password">
+                    </label>
+                    <div>
+                        <button class="mdc-button mdc-button--touch" style="margin-top:20px;>
+                            <span class="mdc-button__ripple"></span>
+                            <span class="mdc-button__touch"></span>
+                            <span class="mdc-button__label">Sign In</span>
+                        </button>
+                        <a class="mdc-button mdc-button--touch" style="margin-top:20px;" id="sup">
+                            <span class="mdc-button__ripple"></span>
+                            <span class="mdc-button__touch"></span>
+                            <span class="mdc-button__label">Sign Up</span>
+                        </a>
+                    </div>
+                </div>   
+            </form>`
+}
+
+function getsignUpRoot() {
+    return `<form name="signUp" style="height:100%;">
+                <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
+                    <div class="text-center">
+                        <h2>Sign up</h2>
+                    </div>
+                    <label class="mdc-text-field mdc-text-field--filled" style="margin-top:50px;>
+                        <span class="mdc-text-field__ripple"></span>
+                        <span class="mdc-floating-label" id="my-label-id" style="bottom:-20px;">Login</span>
+                        <input class="mdc-text-field__input" type="text" aria-labelledby="my-label-id" id="paperInputs1" name="login">
+                    </label>
+                    <label class="mdc-text-field mdc-text-field--filled" style="margin-top:20px;>
+                        <span class="mdc-text-field__ripple"></span>
+                        <span class="mdc-floating-label" id="my-label-id" style="bottom:-20px;">Password</span>
+                        <input class="mdc-text-field__input" type="password" aria-labelledby="my-label-id" id="paperInputs2" name="password">
+                    </label>
+                    <div>
+                        <button class="mdc-button mdc-button--touch" style="margin-top:20px;>
+                            <span class="mdc-button__ripple"></span>
+                            <span class="mdc-button__touch"></span>
+                            <span class="mdc-button__label">Sign Up</span>
+                        </button>
+                        <a class="mdc-button mdc-button--touch" style="margin-top:20px;" id="sin">
+                            <span class="mdc-button__ripple"></span>
+                            <span class="mdc-button__touch"></span>
+                            <span class="mdc-button__label">Sign In</span>
+                        </a>
+                    </div>
+                </div>
+            </form>`
+}
+
 function getTableRoot(rows) {
     return ` <input class="form-control mb-2" type="text" placeholder="filter" id="search-text" onkeyup="tableSearch()">
     <div class="container" style="padding-top: 30px; font-size:15px;">
