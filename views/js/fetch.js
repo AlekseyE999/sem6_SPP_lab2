@@ -43,16 +43,6 @@ async function deleteTask(taskId) {
     await responseRoutine(response);
 }
 
-async function completeTask(task) {
-    const taskId = task.id
-    const response = await fetch(`/tasks/complete/${taskId}`, {
-        method: "PUT",
-        headers: { "Accept": "application/json", "Content-Type": "application/json" },
-        body: JSON.stringify(task)
-    });
-    await responseRoutine(response);
-}
-
 async function sendUser(user) {
     const response = await fetch('/signIn', {
         method: "POST",

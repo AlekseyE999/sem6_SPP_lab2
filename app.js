@@ -1,17 +1,11 @@
 const express = require('express')
 const multer = require("multer")
-const moment = require('moment')
 const cookieParser = require('cookie-parser')
-const Task = require('./task')
-const fs = require('fs')
-const jwt = require('jsonwebtoken')
-const bcrypt = require('bcrypt')
+
+const Controller = require("./controller.js");
+const Auth = require("./middleware/auth.js");
 
 const port = 3333
-const dataPath = 'data.json'
-const idPath = 'id.json'
-const usersPath = 'users.json'
-const tokenKey = 'b91028378997c0b3581821456edefd0ec';
 
 const jsonParser = express.json()
 const app = express()
@@ -25,144 +19,18 @@ app.use(
 
 app.use(cookieParser())
 
-app.use(async (req, res, next) => {
-    console.log("token = " + req.cookies.token)
-    try {
-        let decoded = jwt.verify(req.cookies.token, tokenKey)
-        let users = readToJSON(usersPath)
-        let user = users.find(u => u.login === decoded.login)
-         req.logged = user !== undefined && await bcrypt.compare(decoded.password, user.hashedPassword)
-    } catch {
-         req.logged = false
-    }  
-    next();
-})
+app.use(Auth.auth)
 
-function readToJSON(path) {
-    let data = fs.readFileSync(path, "utf8")
-    return JSON.parse(data)
-}
+app.get("/tasks", Controller.getTasks)
 
-function writeToJSON(path, obj) {
-    const data = JSON.stringify(obj, null, 2)
-    fs.writeFileSync(path, data)
-    return data
-}
+app.post("/upload", Controller.file)
 
-app.get("/tasks", function (req, res) {
-    if (!req.logged) {
-        return res.status(401).json({ message: 'Not authorized' })
-    }
+app.post("/tasks", jsonParser, Controller.addTask)
 
-    console.log(req.url)
+app.post("/signIn", jsonParser, Controller.singIn)
 
-    res.send(readToJSON(dataPath))
-})
+app.post("/signUp", jsonParser, Controller.signUp) 
 
-let lastFile
+app.delete("/tasks/:taskId", Controller.deleteTask)
 
-app.post("/upload", function (req, res, next) {
-    if (!req.logged) {
-        return res.status(401).json({ message: 'Not authorized' })
-    }
-
-    console.log(req.file)
-
-    lastFile = req.file
-    next();
-})
-
-app.post("/tasks", jsonParser, function (req, res) {
-    if (!req.logged) {
-        return res.status(401).json({ message: 'Not authorized' })
-    }
-    if (!req.body)
-        return res.sendStatus(404)
-    let ids = readToJSON(idPath)
-    let data = readToJSON(dataPath)
-
-    ids.taskId = ids.taskId + 1;
-    if (req.body.name === "") {
-        req.body.name = `New task-${ids.taskId}`
-    }
-    if (req.body.expires === "") {
-        req.body.expires = moment(new Date()).add(1, 'days').format('YYYY-MM-DD')
-    }
-
-    const task = new Task(ids.taskId, req.body.name, req.body.expires, req.body.description, req.body.status, lastFile)
-    data.tasks.push(task)
-
-    console.log("POST task")
-    console.log(req.body)
-
-    writeToJSON(idPath, ids)
-    res.send(writeToJSON(dataPath, data))
-})
-
-app.post("/signIn", jsonParser, async function (req, res) {
-    console.log("body in sign in middleware" + req.body)
-    let users = readToJSON(usersPath)
-    let user = users.find(u => u.login === req.body.login)
-    if (user !== undefined) {
-        const match = await bcrypt.compare(req.body.password, user.hashedPassword)
-        if (match) {
-            let token = jwt.sign(req.body, tokenKey)
-            console.log("generated token = " +token)
-            res.cookie('token', token, { httpOnly: true })
-            res.send(readToJSON(dataPath))
-        }
-        else {
-            res.status(401).json({ message: 'Bad password' })
-        }
-    } else {
-        res.status(401).json({ message: 'Not authorized' })
-    }
-})
-
-app.post("/signUp", jsonParser, function (req, res) {
-    console.log(req.body)
-    let users = readToJSON(usersPath)
-    let user = users.find(u => u.login === req.body.login)
-    if (user === undefined) {
-        const hashedPassword = bcrypt.hashSync(req.body.password, 10);
-        users.push({ login: req.body.login, hashedPassword: hashedPassword })
-        let token = jwt.sign(req.body, tokenKey)
-        res.cookie('token', token, { httpOnly: true })
-        writeToJSON(usersPath, users)
-        res.send(readToJSON(dataPath))
-    } else {
-        res.status(401).json({ message: 'Not authorized' })
-    }
-}) 
-
-app.put("/tasks/complete/:taskId", jsonParser, function (req, res) {
-    if (!req.logged) {
-        return res.status(401).json({ message: 'Not authorized' })
-    }
-    if (!req.body)
-        return res.sendStatus(404)
-    let data = readToJSON(dataPath)
-
-    const taskId = req.params.taskId
-    const index = data.tasks.findIndex(x => x.id == parseInt(taskId))
-    data.tasks[index].isComplete = true
-
-    console.log(req.body)
-
-    writeToJSON(dataPath, data)
-    res.send(writeToJSON(dataPath, data))
-})
-
-app.delete("/tasks/:taskId", function (req, res) {
-    if (!req.logged) {
-        return res.status(401).json({ message: 'Not authorized' })
-    }
-    const taskId = req.params.taskId
-    let data = readToJSON(dataPath)
-
-    data.tasks = data.tasks.filter(x => x.id !== parseInt(taskId))
-
-    res.send(writeToJSON(dataPath, data))
-})
-
-app.listen(port)
+app.listen(port, () => console.log("Server started"))

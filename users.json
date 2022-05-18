@@ -6,5 +6,9 @@
   {
     "login": "AlekseyE",
     "hashedPassword": "$2b$10$AiTv.QVMQhO/r92So4R0Te9M4G6pC9mgX.mQAlhj6QBzOVJzkP8nq"
+  },
+  {
+    "login": "dima",
+    "hashedPassword": "$2b$10$nnB6vKg7NiHZ1tmXyg5C/.4zyl0KoCq0l71WqzMjj7L66RfweINAW"
   }
 ]
